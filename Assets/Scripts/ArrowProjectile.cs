@@ -4,13 +4,16 @@ using UnityEngine;
 
 public class ArrowProjectile : MonoBehaviour
 {
+    
     private Rigidbody rb;
     private BowController owner;
     private bool hasHit = false;
+    public float lifeTime = 5f;
 
     void Start()
     {
         rb = GetComponent<Rigidbody>();
+        Destroy(gameObject, lifeTime);
     }
 
     public void SetOwner(BowController bow)
@@ -18,10 +21,6 @@ public class ArrowProjectile : MonoBehaviour
         owner = bow;
     }
 
-    void Update()
-    {
-       
-    }
 
     void OnTriggerEnter(Collider other)
     {
@@ -30,21 +29,21 @@ public class ArrowProjectile : MonoBehaviour
         if (other.CompareTag("Fruit"))
         {
             hasHit = true;
-            GameManager.Instance.AddScore(10);
             Destroy(other.gameObject);
+            GameManager.Instance.AddScore(10);
             Destroy(gameObject);
         }
         else if (other.CompareTag("Bomb"))
         {
             hasHit = true;
             Destroy(other.gameObject);
+            GameManager.Instance.OnBombHit();
             Destroy(gameObject);
-            GameManager.Instance.TriggerGameOver();
         }
         else if (other.CompareTag("Ground"))
         {
             hasHit = true;
-            Destroy(gameObject, 0.5f);  // brief delay so you see it stick
+            Destroy(gameObject, 0.2f);  // brief delay so you see it stick
         }
     }
 }

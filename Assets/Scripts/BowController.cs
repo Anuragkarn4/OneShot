@@ -30,12 +30,6 @@ public class BowController : MonoBehaviour
     [Header("Aiming Area")]
     public float aimRadius = 2f;
 
-    [Header("String Settings")]
-    public LineRenderer bowString;
-    public Transform stringTop;
-    public Transform stringMiddle;
-    public Transform stringBottom;
-
     // Internal state
     private float holdTime = 0f;
     private bool isHolding = false;
@@ -48,16 +42,13 @@ public class BowController : MonoBehaviour
     private float currentAngle = 0f;
     private Vector2 lastAimDir = Vector2.right;
 
+    private float lastShotPercent = 0f;   // 0–1, how strong the last shot was
+
     void Start()
     {
         mainCam = Camera.main;
         defaultRotation = transform.rotation;
         defaultPosition = transform.position;
-
-        if (bowString != null)
-        {
-            bowString.positionCount = 3;
-        }
     }
 
     void Update()
@@ -86,7 +77,6 @@ public class BowController : MonoBehaviour
 
         HandlePullAndRelease();
         UpdateArrowVisual();
-        UpdateStringVisual();
     }
 
     // ─────────────────────────────────────────
@@ -136,7 +126,10 @@ public class BowController : MonoBehaviour
 
         if (Input.GetMouseButtonUp(0) && isHolding)
         {
-            float power = Mathf.Lerp(minPower, maxPower, holdTime / maxHoldTime);
+            float percent = holdTime / maxHoldTime;
+            float power = Mathf.Lerp(minPower, maxPower, percent);
+
+            lastShotPercent = percent;
             FireArrow(power);
             isHolding = false;
             holdTime = 0f;
@@ -217,25 +210,6 @@ public class BowController : MonoBehaviour
         Invoke(nameof(ResetBow), resetDelay);
     }
 
-    void UpdateStringVisual()
-    {
-        if (bowString == null || stringTop == null || stringMiddle == null || stringBottom == null)
-            return;
-
-        // Middle point follows arrow when holding, otherwise sits at rest position
-        Vector3 midPos = stringMiddle.position;
-
-        if (isHolding && hasArrow && arrowTransform != null)
-        {
-            // Make middle of string follow the back of the arrow
-            midPos = arrowTransform.position;
-        }
-
-        bowString.SetPosition(0, stringTop.position);
-        bowString.SetPosition(1, midPos);
-        bowString.SetPosition(2, stringBottom.position);
-    }
-
     // ─────────────────────────────────────────
     // RESET
     // ─────────────────────────────────────────
@@ -266,4 +240,7 @@ public class BowController : MonoBehaviour
     }
 
     public bool IsHolding() => isHolding;
+    public bool HasArrow() => hasArrow;
+
+    public float GetLastShotPercent() => lastShotPercent;
 }
