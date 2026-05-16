@@ -172,6 +172,7 @@ public class BowController : MonoBehaviour
     void FireArrow(float power)
     {
         hasArrow = false;
+        SoundManager.Instance.PlayArrowShoot();
 
         // Hide the visual arrow child
         if (arrowTransform != null)

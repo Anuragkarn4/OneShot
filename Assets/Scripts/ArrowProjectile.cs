@@ -10,6 +10,9 @@ public class ArrowProjectile : MonoBehaviour
     private bool hasHit = false;
     public float lifeTime = 5f;
 
+    [Header("Effects")]
+    public GameObject bombExplosionPrefab;
+
     void Start()
     {
         rb = GetComponent<Rigidbody>();
@@ -29,6 +32,7 @@ public class ArrowProjectile : MonoBehaviour
         if (other.CompareTag("Fruit"))
         {
             hasHit = true;
+            SoundManager.Instance.PlayFruitHit();
             Destroy(other.gameObject);
             GameManager.Instance.AddScore(10);
             Destroy(gameObject);
@@ -36,6 +40,15 @@ public class ArrowProjectile : MonoBehaviour
         else if (other.CompareTag("Bomb"))
         {
             hasHit = true;
+            SoundManager.Instance.PlayBombExplosion();
+
+            if (bombExplosionPrefab != null)
+            {
+                Instantiate(bombExplosionPrefab,
+                            other.transform.position,
+                            Quaternion.identity);
+            }
+            
             Destroy(other.gameObject);
             GameManager.Instance.OnBombHit();
             Destroy(gameObject);

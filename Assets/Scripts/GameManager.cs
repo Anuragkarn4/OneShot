@@ -79,8 +79,13 @@ public class GameManager : MonoBehaviour
         isGameOver = true;
         Time.timeScale = 0f;
 
+        bool isNewBest = score > PlayerPrefs.GetInt(BestScoreKey, 0);
+
         if (UIManager.Instance != null)
             UIManager.Instance.ShowGameOver(score, bestScore);
+
+        if (SoundManager.Instance != null)
+            SoundManager.Instance.PlayGameOverSound(isNewBest);
     }
 
     public void RestartGame()
